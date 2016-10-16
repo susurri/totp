@@ -1,23 +1,22 @@
 require 'yaml'
 require 'io/console'
 require 'openssl'
-require 'curses'
 require 'rotp'
+require 'totp/window'
 
 module Totp
   # handle encrypted secrets store
   class Secrets
-    include Curses
     def initialize(filename)
       @filename = filename
       @secrets = []
       @totp = {}
       @encryption = nil
       @passphrase = passphrase
-      if File.exist?(filename)
-        load
-        init_totp
-      end
+      @window = Window.new
+      return unless File.exist?(filename)
+      load
+      init_totp
     end
 
     def add(entry)
@@ -29,40 +28,22 @@ module Totp
     end
 
     def list
-      p @secrets
       @secrets.each do |secret|
         puts secret[:id]
       end
     end
 
     def print
-      init_screen
-      Curses.timeout = 1000
-      begin
-        loop do
-          count = 30 - Time.now.to_i % 30
-          crmode
-          show_message(lines - 1, cols - 20, 'Hit any key to quit')
-          show_message(0, 0, 'remaining ' + sprintf('%02d', count))
-          @secrets.each_index do |index|
-            show_message(index + 2, 0, @secrets[index][:id].to_s)
-            addstr(' : ' + @totp[@secrets[index][:id]].now.to_s)
-          end
-          refresh
-          break if getch
-          refresh
-        end
-      ensure
-        close_screen
+      @window.init_curses
+      loop do
+        @window.show_curses(@secrets, @totp)
+        break if @window.getch
       end
+    ensure
+      @window.close
     end
 
     private
-
-    def show_message(x, y, message)
-      setpos(x, y)
-      addstr(message)
-    end
 
     def init_totp
       @secrets.each do |secret|
