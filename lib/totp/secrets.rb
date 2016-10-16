@@ -12,14 +12,11 @@ module Totp
       @secrets = []
       @totp = {}
       @encryption = nil
-      @passphrase = passphrase
       @window = Window.new
-      return unless File.exist?(filename)
-      load
-      init_totp
     end
 
     def add(entry)
+      load
       list
       return if dup?(entry)
       @secrets.reject! { |secret| secret[:id] == entry[:id] }
@@ -28,18 +25,22 @@ module Totp
     end
 
     def remove(id)
+      load
       list
       @secrets.reject! { |secret| secret[:id] == id }
       save
     end
 
     def list
+      load
       @secrets.each do |secret|
         puts secret[:id]
       end
     end
 
     def print
+      load
+      init_totp
       @window.init_curses
       loop do
         @window.show_curses(@secrets, @totp)
@@ -92,6 +93,8 @@ module Totp
     end
 
     def load
+      return unless File.exist?(@filename)
+      @passphrase = passphrase
       f = File.open(@filename, 'rb')
       @secrets = YAML.load(decrypt(f.read))
       f.close
