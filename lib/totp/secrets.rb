@@ -27,6 +27,12 @@ module Totp
       save
     end
 
+    def remove(id)
+      list
+      @secrets.reject! { |secret| secret[:id] == id }
+      save
+    end
+
     def list
       @secrets.each do |secret|
         puts secret[:id]

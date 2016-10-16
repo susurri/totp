@@ -20,6 +20,13 @@ module Totp
       secret = STDIN.gets.chomp
       @secrets.add(id: id, secret: secret)
     end
+    desc 'remove', 'remove secret.'
+    def remove
+      STDOUT.print 'id: '
+      id = STDIN.gets.chomp
+      STDOUT.print 'remove ' + id + '? y/[n] '
+      @secrets.remove(id) if /^[yY]/ =~ STDIN.gets
+    end
     desc 'list', 'list IDs'
     def list
       @secrets.list
