@@ -67,15 +67,21 @@ module Totp
       true
     end
 
+    def key_iv(passphrase, salt, cipher)
+      digest = OpenSSL::Digest.new('sha512')
+      key_iv = OpenSSL::PKCS5.pbkdf2_hmac(passphrase, salt, 2000,
+                                          cipher.key_len + cipher.iv_len,
+                                          digest)
+      key = key_iv[0, cipher.key_len]
+      iv = key_iv[cipher.key_len, cipher.iv_len]
+      [key, iv]
+    end
+
     def encrypt(data)
       enc = OpenSSL::Cipher::Cipher.new('AES-256-CBC')
       salt = OpenSSL::Random.random_bytes(8)
       enc.encrypt
-      digest = OpenSSL::Digest.new('sha512')
-      key_iv = OpenSSL::PKCS5.pbkdf2_hmac(@passphrase, salt, 2000,
-                                          enc.key_len + enc.iv_len, digest)
-      enc.key = key_iv[0, enc.key_len]
-      enc.iv = key_iv[enc.key_len, enc.iv_len]
+      enc.key, enc.iv = key_iv(@passphrase, salt, enc)
       'Salted__' + salt + enc.update(data) + enc.final
     end
 
@@ -84,11 +90,7 @@ module Totp
       data = data[16..-1]
       dec = OpenSSL::Cipher::Cipher.new('AES-256-CBC')
       dec.decrypt
-      digest = OpenSSL::Digest.new('sha512')
-      key_iv = OpenSSL::PKCS5.pbkdf2_hmac(@passphrase, salt, 2000,
-                                          dec.key_len + dec.iv_len, digest)
-      dec.key = key_iv[0, dec.key_len]
-      dec.iv = key_iv[dec.key_len, dec.iv_len]
+      dec.key, dec.iv = key_iv(@passphrase, salt, dec)
       dec.update(data) + dec.final
     end
 
