@@ -31,5 +31,9 @@ module Totp
     def list
       @secrets.list
     end
+    desc 'chpass', 'change passphrase'
+    def chpass
+      @secrets.chpass
+    end
   end
 end

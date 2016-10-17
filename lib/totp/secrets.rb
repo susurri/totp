@@ -18,7 +18,6 @@ module Totp
 
     def add(entry)
       load
-      list
       return if dup?(entry)
       @secrets.reject! { |secret| secret[:id] == entry[:id] }
       @secrets.push(entry)
@@ -27,7 +26,6 @@ module Totp
 
     def remove(id)
       load
-      list
       @secrets.reject! { |secret| secret[:id] == id }
       save
     end
@@ -49,6 +47,15 @@ module Totp
       end
     ensure
       @window.close
+    end
+
+    def chpass
+      load
+      new_passphrase = ask_noecho('New Passphrase: ')
+      new_passphrase2 = ask_noecho('New Passphrase(confirm): ')
+      abort 'Passphrase does not match' if new_passphrase != new_passphrase2
+      @passphrase = new_passphrase
+      save
     end
 
     private
