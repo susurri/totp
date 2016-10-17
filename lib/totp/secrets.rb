@@ -3,10 +3,12 @@ require 'io/console'
 require 'openssl'
 require 'rotp'
 require 'totp/window'
+require 'totp/passphrase'
 
 module Totp
   # handle encrypted secrets store
   class Secrets
+    include Passphrase
     def initialize(filename)
       @filename = filename
       @secrets = []
@@ -63,22 +65,6 @@ module Totp
       STDOUT.print 'replace ' + entry[:id] + '? y/[n] '
       return false if /^[yY]/ =~ STDIN.gets
       true
-    end
-
-    def ask_noecho(prompt)
-      STDOUT.print prompt
-      input = STDIN.noecho(&:gets).chomp
-      puts
-      input
-    end
-
-    def passphrase
-      ask_noecho('Passphrase: ')
-    end
-
-    def confirm_passphrase(pass)
-      return pass if pass == ask_noecho('Passphrase(confirm): ')
-      nil
     end
 
     def encrypt(data)
