@@ -96,7 +96,7 @@ module Totp
 
     def load
       return unless File.exist?(@filename)
-      @passphrase = passphrase
+      @passphrase = passphrase unless @passphrase
       f = File.open(@filename, 'rb')
       @secrets = YAML.load(decrypt(f.read))
       f.close
