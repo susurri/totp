@@ -1,8 +1,8 @@
 # Totp
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/totp`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+totp is an application for Two-factor authentication (2FA) with Time-Based
+One-Time Password (TOTP) like google or github.
+It stores id/key pairs in the encrypted file.
 
 ## Installation
 
@@ -22,7 +22,13 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Commands:
+  totp add             # add secret.
+  totp chpass          # change passphrase
+  totp help [COMMAND]  # Describe available commands or one specific command
+  totp list            # list IDs
+  totp print           # print totp codes.
+  totp remove          # remove secret.
 
 ## Development
 
