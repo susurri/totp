@@ -11,7 +11,6 @@ module Totp
       @filename = filename
       @secrets = []
       @totp = {}
-      @encryption = nil
       @window = Window.new
     end
 
@@ -66,30 +65,45 @@ module Totp
       true
     end
 
-    def passphrase
-      STDOUT.print 'Passphrase: '
-      pass = STDIN.noecho(&:gets)
+    def ask_noecho(prompt)
+      STDOUT.print prompt
+      input = STDIN.noecho(&:gets).chomp
       puts
-      pass
+      input
+    end
+
+    def passphrase
+      ask_noecho('Passphrase: ')
+    end
+
+    def confirm_passphrase(pass)
+      return pass if pass == ask_noecho('Passphrase(confirm): ')
+      nil
     end
 
     def encrypt(data)
-      cipher = OpenSSL::Cipher::Cipher.new('AES-256-CBC')
+      enc = OpenSSL::Cipher::Cipher.new('AES-256-CBC')
       salt = OpenSSL::Random.random_bytes(8)
-      cipher.encrypt
-      cipher.pkcs5_keyivgen(@passphrase, salt)
-      encrypted_data = cipher.update(data) + cipher.final
-      'Salted__' + salt + encrypted_data
+      enc.encrypt
+      digest = OpenSSL::Digest.new('sha512')
+      key_iv = OpenSSL::PKCS5.pbkdf2_hmac(@passphrase, salt, 2000,
+                                          enc.key_len + enc.iv_len, digest)
+      enc.key = key_iv[0, enc.key_len]
+      enc.iv = key_iv[enc.key_len, enc.iv_len]
+      'Salted__' + salt + enc.update(data) + enc.final
     end
 
     def decrypt(data)
-      data = data.force_encoding('ASCII-8BIT')
       salt = data[8, 8]
-      data = data[16, data.size]
-      cipher = OpenSSL::Cipher::Cipher.new('AES-256-CBC')
-      cipher.decrypt
-      cipher.pkcs5_keyivgen(@passphrase, salt)
-      cipher.update(data) + cipher.final
+      data = data[16..-1]
+      dec = OpenSSL::Cipher::Cipher.new('AES-256-CBC')
+      dec.decrypt
+      digest = OpenSSL::Digest.new('sha512')
+      key_iv = OpenSSL::PKCS5.pbkdf2_hmac(@passphrase, salt, 2000,
+                                          dec.key_len + dec.iv_len, digest)
+      dec.key = key_iv[0, dec.key_len]
+      dec.iv = key_iv[dec.key_len, dec.iv_len]
+      dec.update(data) + dec.final
     end
 
     def load
@@ -101,6 +115,12 @@ module Totp
     end
 
     def save
+      unless File.exist?(@filename)
+        loop do
+          break if (@passphrase = confirm_passphrase(passphrase))
+          puts 'passphrase not match'
+        end
+      end
       f = File.open(@filename, 'wb')
       f.write(encrypt(YAML.dump(@secrets)))
       f.close
