@@ -1,11 +1,11 @@
 require 'thor'
-require 'totp/secrets'
+require 'totpc/secrets'
 
-module Totp
+module Totpc
   # command line interpreter
   class CLI < Thor
     def initialize(args, local_options, config)
-      @secrets = Secrets.new(Dir.home + '/.totp')
+      @secrets = Secrets.new(Dir.home + '/.totpc')
       super(args, local_options, config)
     end
     desc 'print', 'print totp codes.'

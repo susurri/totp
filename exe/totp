@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
 
-require "totp"
+require "totpc"
 
-Totp::CLI.start
+Totpc::CLI.start

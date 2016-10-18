@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe Totp do
+describe Totpc do
   it 'has a version number' do
-    expect(Totp::VERSION).not_to be nil
+    expect(Totpc::VERSION).not_to be nil
   end
 
   it 'does something useful' do

@@ -1,4 +1,4 @@
-module Totp
+module Totpc
   # methods to ask passphrase
   module Passphrase
     def ask_noecho(prompt)

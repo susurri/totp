@@ -1,17 +1,17 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'totp/version'
+require 'totpc/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "totp"
-  spec.version       = Totp::VERSION
+  spec.name          = "totpc"
+  spec.version       = Totpc::VERSION
   spec.authors       = ["susurri"]
   spec.email         = ["susurrus.silent@gmail.com"]
 
   spec.summary       = %q{an application for 2FA using TOTP}
   spec.description   = %q{}
-  spec.homepage      = "https://github.com/susurri/totp"
+  spec.homepage      = "https://github.com/susurri/totpc"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }

@@ -1,6 +1,6 @@
 require 'curses'
 
-module Totp
+module Totpc
   # curses window to show codes
   class Window
     include Curses

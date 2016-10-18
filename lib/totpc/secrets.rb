@@ -2,10 +2,10 @@ require 'yaml'
 require 'io/console'
 require 'openssl'
 require 'rotp'
-require 'totp/window'
-require 'totp/passphrase'
+require 'totpc/window'
+require 'totpc/passphrase'
 
-module Totp
+module Totpc
   # handle encrypted secrets store
   class Secrets
     include Passphrase
