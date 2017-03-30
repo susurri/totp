@@ -85,7 +85,7 @@ module Totpc
     end
 
     def encrypt(data)
-      enc = OpenSSL::Cipher::Cipher.new('AES-256-CBC')
+      enc = OpenSSL::Cipher.new('AES-256-CBC')
       salt = OpenSSL::Random.random_bytes(8)
       enc.encrypt
       enc.key, enc.iv = key_iv(@passphrase, salt, enc)
@@ -95,7 +95,7 @@ module Totpc
     def decrypt(data)
       salt = data[8, 8]
       data = data[16..-1]
-      dec = OpenSSL::Cipher::Cipher.new('AES-256-CBC')
+      dec = OpenSSL::Cipher.new('AES-256-CBC')
       dec.decrypt
       dec.key, dec.iv = key_iv(@passphrase, salt, dec)
       dec.update(data) + dec.final
