@@ -105,7 +105,7 @@ module Totpc
       return unless File.exist?(@filename)
       @passphrase = passphrase unless @passphrase
       f = File.open(@filename, 'rb')
-      @secrets = YAML.load(decrypt(f.read))
+      @secrets = YAML.safe_load(decrypt(f.read), [Symbol])
       f.close
     end
 
